@@ -3,28 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gọi Số Khẩn Cấp</title>
+    <title>Mở Ghi Chú</title>
     <style>
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            background-color: #f0f0f0;
             font-family: Arial, sans-serif;
         }
-        button {
-            padding: 15px 30px;
-            font-size: 18px;
+        #computer {
+            width: 200px;
+            height: 150px;
+            background-color: #ccc;
+            border: 2px solid #666;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
+        }
+        #note {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #666;
+            background-color: #fff;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <button id="callButton">Gọi 113</button>
+    <div id="computer">Nhấn vào máy tính</div>
+    <div id="note">Đây là một ghi chú!</div>
 
     <script>
-        document.getElementById('callButton').addEventListener('click', () => {
-            window.location.href = 'tel:113'; // Chuyển hướng đến ứng dụng điện thoại để gọi
+        const computer = document.getElementById('computer');
+        const note = document.getElementById('note');
+
+        computer.addEventListener('click', () => {
+            note.style.display = 'block';
         });
     </script>
 </body>
