@@ -3,77 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chụp Ảnh và Gửi qua Webhook</title>
+    <title>Nhắn Tin Trực Tuyến</title>
     <style>
         body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
             background-color: #f0f0f0;
         }
-        video {
-            width: 320px;
-            height: 240px;
-            border: 2px solid #666;
+        #chat {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            background-color: #fff;
         }
-        canvas {
-            display: none;
+        #messageInput {
+            width: 80%;
+            padding: 10px;
+        }
+        #sendButton {
+            padding: 10px;
+        }
+        #friendList {
+            margin-bottom: 20px;
+        }
+        .friend {
+            cursor: pointer;
+            margin: 5px 0;
+            padding: 5px;
+            background-color: #e0e0e0;
+        }
+        .friend:hover {
+            background-color: #d0d0d0;
         }
     </style>
 </head>
 <body>
-    <h1>Chụp Ảnh</h1>
-    <video id="video" autoplay></video>
-    <button id="capture">Chụp Ảnh</button>
-    <canvas id="canvas"></canvas>
+    <h1>Nhắn Tin Trực Tuyến</h1>
+
+    <input type="text" id="searchInput" placeholder="Tìm kiếm bạn bè...">
+    <div id="friendList"></div>
+
+    <div id="chat"></div>
+    <input type="text" id="messageInput" placeholder="Nhập tin nhắn...">
+    <button id="sendButton">Gửi</button>
 
     <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const captureButton = document.getElementById('capture');
+        const chat = document.getElementById('chat');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const searchInput = document.getElementById('searchInput');
+        const friendList = document.getElementById('friendList');
 
-        // Khởi động camera
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream;
-            })
-            .catch(err => {
-                console.error("Lỗi truy cập camera: ", err);
-            });
+        let currentFriend = null;
 
-        // Chụp ảnh
-        captureButton.addEventListener('click', () => {
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0);
+        // Giả lập danh sách bạn bè
+        const friends = [
+            { name: 'Nguyễn Văn A', id: 1 },
+            { name: 'Trần Thị B', id: 2 },
+            { name: 'Lê Văn C', id: 3 }
+        ];
 
-            // Chuyển đổi ảnh thành data URL
-            const imageData = canvas.toDataURL('image/png');
-
-            // Gửi ảnh qua webhook
-            sendImageToWebhook(imageData);
-        });
-
-        // Hàm gửi ảnh qua webhook
-        function sendImageToWebhook(imageData) {
-            fetch('https://discord.com/api/webhooks/1295745366435561503/Zo_XHN4YlWh3T_eTzGXS94Z06Kse57GXw36d3qpiuvgITnml65RZrYlg6OO-q01348Ao', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ image: imageData }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Thành công:', data);
-            })
-            .catch((error) => {
-                console.error('Lỗi:', error);
+        // Hiển thị danh sách bạn bè
+        function displayFriends(friends) {
+            friendList.innerHTML = '';
+            friends.forEach(friend => {
+                const friendDiv = document.createElement('div');
+                friendDiv.className = 'friend';
+                friendDiv.innerText = friend.name;
+                friendDiv.onclick = () => {
+                    currentFriend = friend;
+                    chat.innerHTML = `Chat với ${friend.name}:<br/>`;
+                };
+                friendList.appendChild(friendDiv);
             });
         }
+
+        // Tìm kiếm bạn bè
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            const filteredFriends = friends.filter(friend => 
+                friend.name.toLowerCase().includes(query)
+            );
+            displayFriends(filteredFriends);
+        });
+
+        // Gửi tin nhắn
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value;
+            if (message && currentFriend) {
+                // Hiển thị tin nhắn trong chat
+                chat.innerHTML += `<div>${currentFriend.name}: ${message}</div>`;
+                messageInput.value = '';
+            }
+        });
+
+        // Hiển thị tất cả bạn bè ban đầu
+        displayFriends(friends);
     </script>
 </body>
 </html>
