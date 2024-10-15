@@ -3,35 +3,27 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
 
-// Giả lập cơ sở dữ liệu
-let messages = [];
-let users = [
-    { phone: '0123456789', password: 'password123', name: 'Nguyễn Văn A' },
-    { phone: '0987654321', password: 'password456', name: 'Trần Thị B' },
-    { phone: '0912345678', password: 'password789', name: 'Lê Văn C' }
-];
+// Giả lập số điện thoại ảo
+const virtualNumbers = {
+    '0123456789': '0987654321',
+    '0987654321': '0123456789',
+    '0912345678': '0876543210',
+};
 
 // Middleware
 app.use(bodyParser.json());
 app.use(express.static('public')); // Thư mục chứa file HTML
 
-// Đăng ký người dùng
-app.post('/register', (req, res) => {
-    const { phone, password, name } = req.body;
-    users.push({ phone, password, name });
-    res.send({ message: 'Đăng ký thành công!' });
-});
+// API để lấy số điện thoại ảo
+app.post('/get-virtual-number', (req, res) => {
+    const { phone } = req.body;
+    const virtualNumber = virtualNumbers[phone];
 
-// Gửi tin nhắn
-app.post('/send-message', (req, res) => {
-    const { message, userId } = req.body; // Cần truyền userId để lưu tin nhắn
-    messages.push({ message, userId });
-    res.send({ message: `Bạn: ${message}` });
-});
-
-// Lấy danh sách bạn bè
-app.get('/friends', (req, res) => {
-    res.send(users);
+    if (virtualNumber) {
+        res.send({ virtualNumber });
+    } else {
+        res.status(404).send({ message: 'Số điện thoại không có sẵn.' });
+    }
 });
 
 // Khởi động server
