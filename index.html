@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chụp Ảnh Webcam</title>
+    <style>
+        video {
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid black;
+        }
+        canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chụp Ảnh Webcam</h1>
+    <video id="video" autoplay></video>
+    <button id="capture">Chụp Ảnh</button>
+    <canvas id="canvas"></canvas>
+    <img id="photo" alt="Chụp ảnh" />
+
+    <script>
+        // Lấy các phần tử
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const photo = document.getElementById('photo');
+        const captureButton = document.getElementById('capture');
+
+        // Khởi tạo webcam
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((err) => {
+                console.error("Không thể truy cập webcam: ", err);
+            });
+
+        // Chức năng chụp ảnh
+        captureButton.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            photo.src = canvas.toDataURL('image/png');
+        });
+    </script>
+</body>
+</html>
