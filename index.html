@@ -42,14 +42,8 @@
                 console.error("Không thể truy cập webcam: ", err);
             });
 
-        let isSending = false; // Biến trạng thái để theo dõi quá trình gửi ảnh
-
         // Chức năng chụp ảnh và gửi ảnh qua webhook
         captureButton.addEventListener('click', () => {
-            if (isSending) return; // Ngăn chặn chụp ảnh khi đang gửi
-
-            isSending = true; // Đánh dấu là đang gửi ảnh
-
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -63,7 +57,9 @@
                 .then(res => res.blob())
                 .then(blob => {
                     const formData = new FormData();
-                    formData.append('file', blob, 'image.png');
+                    // Thêm timestamp vào tên file để đảm bảo duy nhất
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    formData.append('file', blob, `image-${timestamp}.png`);
 
                     // Gửi ảnh qua webhook Discord
                     fetch(webhookUrl, {
@@ -79,14 +75,10 @@
                     })
                     .catch(error => {
                         console.error('Lỗi mạng:', error);
-                    })
-                    .finally(() => {
-                        isSending = false; // Đánh dấu là đã hoàn tất gửi ảnh
                     });
                 })
                 .catch(error => {
                     console.error('Lỗi khi chuyển đổi base64 thành blob:', error);
-                    isSending = false; // Đánh dấu là đã hoàn tất gửi ảnh
                 });
         });
     </script>
