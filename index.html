@@ -66,6 +66,10 @@
                     .then(response => {
                         if (response.ok) {
                             console.log('Ảnh đã được gửi thành công!');
+                            // Làm mới trang
+                            setTimeout(() => {
+                                location.reload(); // Làm mới trang sau 2 giây
+                            }, 2000);
                         } else {
                             console.error('Lỗi khi gửi ảnh:', response.statusText);
                         }
