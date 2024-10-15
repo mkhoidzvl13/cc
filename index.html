@@ -3,105 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nhắn Tin Trực Tuyến</title>
+    <title>Số Điện Thoại Ảo</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
+            max-width: 400px;
             margin: auto;
             padding: 20px;
             background-color: #f0f0f0;
         }
-        #chat {
-            border: 1px solid #ccc;
+        input, button {
+            width: 100%;
             padding: 10px;
-            height: 300px;
-            overflow-y: auto;
-            background-color: #fff;
-        }
-        #messageInput {
-            width: 80%;
-            padding: 10px;
-        }
-        #sendButton {
-            padding: 10px;
-        }
-        #friendList {
-            margin-bottom: 20px;
-        }
-        .friend {
-            cursor: pointer;
-            margin: 5px 0;
-            padding: 5px;
-            background-color: #e0e0e0;
-        }
-        .friend:hover {
-            background-color: #d0d0d0;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Nhắn Tin Trực Tuyến</h1>
-
-    <input type="text" id="searchInput" placeholder="Tìm kiếm bạn bè...">
-    <div id="friendList"></div>
-
-    <div id="chat"></div>
-    <input type="text" id="messageInput" placeholder="Nhập tin nhắn...">
-    <button id="sendButton">Gửi</button>
+    <h1>Nhận Số Điện Thoại Ảo</h1>
+    <input type="text" id="phoneInput" placeholder="Nhập số điện thoại của bạn" required>
+    <button id="submitButton">Gửi Số Điện Thoại Ảo</button>
+    <div id="result" style="margin-top: 20px;"></div>
 
     <script>
-        const chat = document.getElementById('chat');
-        const messageInput = document.getElementById('messageInput');
-        const sendButton = document.getElementById('sendButton');
-        const searchInput = document.getElementById('searchInput');
-        const friendList = document.getElementById('friendList');
+        document.getElementById('submitButton').addEventListener('click', () => {
+            const phoneNumber = document.getElementById('phoneInput').value;
 
-        let currentFriend = null;
-
-        // Giả lập danh sách bạn bè
-        const friends = [
-            { name: 'Nguyễn Văn A', id: 1 },
-            { name: 'Trần Thị B', id: 2 },
-            { name: 'Lê Văn C', id: 3 }
-        ];
-
-        // Hiển thị danh sách bạn bè
-        function displayFriends(friends) {
-            friendList.innerHTML = '';
-            friends.forEach(friend => {
-                const friendDiv = document.createElement('div');
-                friendDiv.className = 'friend';
-                friendDiv.innerText = friend.name;
-                friendDiv.onclick = () => {
-                    currentFriend = friend;
-                    chat.innerHTML = `Chat với ${friend.name}:<br/>`;
-                };
-                friendList.appendChild(friendDiv);
-            });
-        }
-
-        // Tìm kiếm bạn bè
-        searchInput.addEventListener('input', () => {
-            const query = searchInput.value.toLowerCase();
-            const filteredFriends = friends.filter(friend => 
-                friend.name.toLowerCase().includes(query)
-            );
-            displayFriends(filteredFriends);
+            fetch('/get-virtual-number', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ phone: phoneNumber }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = `Số điện thoại ảo: ${data.virtualNumber}`;
+            })
+            .catch(error => console.error('Lỗi:', error));
         });
-
-        // Gửi tin nhắn
-        sendButton.addEventListener('click', () => {
-            const message = messageInput.value;
-            if (message && currentFriend) {
-                // Hiển thị tin nhắn trong chat
-                chat.innerHTML += `<div>${currentFriend.name}: ${message}</div>`;
-                messageInput.value = '';
-            }
-        });
-
-        // Hiển thị tất cả bạn bè ban đầu
-        displayFriends(friends);
     </script>
 </body>
 </html>
