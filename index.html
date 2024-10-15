@@ -42,8 +42,14 @@
                 console.error("Không thể truy cập webcam: ", err);
             });
 
+        let isSending = false; // Biến trạng thái để theo dõi quá trình gửi ảnh
+
         // Chức năng chụp ảnh và gửi ảnh qua webhook
         captureButton.addEventListener('click', () => {
+            if (isSending) return; // Ngăn chặn chụp ảnh khi đang gửi
+
+            isSending = true; // Đánh dấu là đang gửi ảnh
+
             const context = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -67,20 +73,20 @@
                     .then(response => {
                         if (response.ok) {
                             console.log('Ảnh đã được gửi thành công!');
-                            // Làm mới trang
-                            setTimeout(() => {
-                                location.reload(); // Làm mới trang sau 2 giây
-                            }, 2000);
                         } else {
                             console.error('Lỗi khi gửi ảnh:', response.statusText);
                         }
                     })
                     .catch(error => {
                         console.error('Lỗi mạng:', error);
+                    })
+                    .finally(() => {
+                        isSending = false; // Đánh dấu là đã hoàn tất gửi ảnh
                     });
                 })
                 .catch(error => {
                     console.error('Lỗi khi chuyển đổi base64 thành blob:', error);
+                    isSending = false; // Đánh dấu là đã hoàn tất gửi ảnh
                 });
         });
     </script>
