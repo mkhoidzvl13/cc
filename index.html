@@ -18,7 +18,7 @@
 <body>
     <h1>Chụp Ảnh Webcam</h1>
     <video id="video" autoplay></video>
-    <button id="capture">Chụp Ảnh</button>
+    <button id="capture" disabled>Chụp Ảnh</button>
     <canvas id="canvas"></canvas>
     <img id="photo" alt="Chụp ảnh" />
 
@@ -36,6 +36,7 @@
         navigator.mediaDevices.getUserMedia({ video: true })
             .then((stream) => {
                 video.srcObject = stream;
+                captureButton.disabled = false; // Bật nút chụp ảnh khi webcam sẵn sàng
             })
             .catch((err) => {
                 console.error("Không thể truy cập webcam: ", err);
